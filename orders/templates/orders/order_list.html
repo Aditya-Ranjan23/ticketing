@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}My orders – Ticketing{% endblock %}
+{% block extra_css %}
+<style>
+    .status-cancelled {
+        color: #f87171;
+        font-weight: 600;
+        padding: 0.15rem 0.5rem;
+        border-radius: 6px;
+        background: rgba(248, 113, 113, 0.15);
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="hero">
+    <h1>My orders</h1>
+    <p class="sub">View your ticket orders</p>
+</div>
+
+<h2 style="margin-bottom: 1rem; font-size: 1.25rem;">Cart</h2>
+{% for order in cart_orders %}
+<div class="card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <a href="{% url 'order_detail' order.pk %}"><strong>Order #{{ order.pk }}</strong></a>
+        <span class="muted"> — {{ order.event.name }} · ${{ order.total_amount }}</span>
+    </div>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'order_edit' order.pk %}" class="btn btn-outline">Edit</a>
+        <form method="post" action="{% url 'order_cancel' order.pk %}" style="margin: 0;" onsubmit="return confirm('Remove this order and release the tickets?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline" style="color: #f87171; border-color: rgba(248,113,113,0.5);">Remove</button>
+        </form>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <p class="muted">No orders in your cart.</p>
+</div>
+{% endfor %}
+
+{% if paid_orders %}
+<h2 style="margin: 2rem 0 1rem; font-size: 1.25rem;">Past orders</h2>
+{% for order in paid_orders %}
+<div class="card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <a href="{% url 'order_detail' order.pk %}"><strong>Order #{{ order.pk }}</strong></a>
+        <span class="muted"> — {{ order.event.name }} · Paid · ${{ order.total_amount }}</span>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<h2 style="margin: 2rem 0 1rem; font-size: 1.25rem;">Cancelled</h2>
+{% for order in cancelled_orders %}
+<div class="card order-cancelled" style="opacity: 0.85; border-color: rgba(148, 163, 184, 0.25);">
+    <a href="{% url 'order_detail' order.pk %}"><strong>Order #{{ order.pk }}</strong></a>
+    <span class="muted"> — {{ order.event.name }} · </span>
+    <span class="status-cancelled">Cancelled</span>
+    <span class="muted"> · ${{ order.total_amount }}</span>
+</div>
+{% empty %}
+<div class="card" style="opacity: 0.85;">
+    <p class="muted">No cancelled orders.</p>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.pk }} – Ticketing{% endblock %}
+{% block content %}
+<div class="hero">
+    <h1>Order #{{ order.pk }}</h1>
+    <p class="sub">{{ order.event.name }} · {{ order.get_status_display }}</p>
+</div>
+<div class="card">
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                <th style="padding: 0.5rem 0;" class="muted">Ticket</th>
+                <th style="padding: 0.5rem 0;" class="muted">Qty</th>
+                <th style="padding: 0.5rem 0;" class="muted">Unit price</th>
+                <th style="padding: 0.5rem 0;" class="muted">Line total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.5rem 0;">{{ item.ticket_type.name }}</td>
+                <td style="padding: 0.5rem 0;">{{ item.quantity }}</td>
+                <td style="padding: 0.5rem 0;">${{ item.unit_price }}</td>
+                <td style="padding: 0.5rem 0;">${{ item.line_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p><strong>Total:</strong> ${{ order.total_amount }}</p>
+    <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{% url 'order_list' %}" class="btn btn-outline">← Back to orders</a>
+        {% if order.status == 'pending' %}
+        <a href="{% url 'order_edit' order.pk %}" class="btn">Edit order</a>
+        <form method="post" action="{% url 'order_cancel' order.pk %}" style="margin: 0;" onsubmit="return confirm('Remove this order and release the tickets?');">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background: transparent; color: #f87171; border: 1px solid rgba(248,113,113,0.5);">Remove order</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

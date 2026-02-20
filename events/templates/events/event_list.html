@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Events – Ticketing{% endblock %}
+{% block extra_css %}
+<style>
+    .event-stack {
+        margin: 0 -1.5rem;
+        padding: 0 1.5rem 2rem;
+    }
+    .event-stack-item {
+        position: sticky;
+        top: 0;
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        padding: 2rem 0;
+        z-index: 0;
+    }
+    .event-stack-item:nth-child(1) { z-index: 1; }
+    .event-stack-item:nth-child(2) { z-index: 2; }
+    .event-stack-item:nth-child(3) { z-index: 3; }
+    .event-stack-item:nth-child(4) { z-index: 4; }
+    .event-stack-item:nth-child(5) { z-index: 5; }
+    .event-stack-item:nth-child(n+6) { z-index: 6; }
+    .event-stack-item .card {
+        width: 100%;
+        margin-bottom: 0;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="hero">
+    <h1>Upcoming events</h1>
+    <p class="sub">Discover and reserve your seat — scroll to see more</p>
+</div>
+<div class="event-stack">
+{% for event in events %}
+    <article class="event-stack-item">
+        <div class="card event-card">
+            <div class="event-meta muted">
+                {{ event.venue }} · {{ event.start_at|date:"d M Y" }} · {{ event.start_at|time:"H:i" }}
+            </div>
+            <h2><a href="{% url 'event_detail' event.slug %}">{{ event.name }}</a></h2>
+            <p class="muted" style="margin-bottom: 1rem;">{{ event.description|truncatewords:35 }}</p>
+            <a href="{% url 'event_detail' event.slug %}" class="btn">View & get tickets</a>
+        </div>
+    </article>
+{% empty %}
+    <div class="card">
+        <p class="muted">No events at the moment. Check back soon.</p>
+    </div>
+{% endfor %}
+</div>
+{% if page_obj.has_other_pages %}
+<p class="muted" style="margin-top: 1rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+{% endif %}
+{% endblock %}

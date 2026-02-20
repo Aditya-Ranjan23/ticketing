@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Edit order #{{ order.pk }} – Ticketing{% endblock %}
+{% block content %}
+<div class="hero">
+    <h1>Edit order #{{ order.pk }}</h1>
+    <p class="sub">{{ event.name }}</p>
+</div>
+{% if messages %}
+<div class="card" style="margin-bottom: 1rem;">
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+<div class="card">
+    <form method="post" action="{% url 'order_edit' order.pk %}">
+        {% csrf_token %}
+        <p class="muted" style="margin-bottom: 1.25rem;">Change quantities below. Available includes tickets already in this order.</p>
+        {% for tt in ticket_types %}
+        <div class="checkout-row" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div style="flex: 1; min-width: 0;">
+                <strong>{{ tt.name }}</strong>
+                <span class="muted"> — ${{ tt.price }} each · {{ tt.quantity_available }} available ({{ tt.current_qty }} in this order)</span>
+            </div>
+            <label for="qty_{{ tt.id }}" class="muted">Qty</label>
+            <input type="number" name="qty_{{ tt.id }}" id="qty_{{ tt.id }}" min="0" max="{{ tt.max_editable }}" value="{{ tt.current_qty }}" style="width: 5rem; padding: 0.5rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem;">
+        </div>
+        {% empty %}
+        <p class="muted">No ticket types for this event.</p>
+        {% endfor %}
+        {% if ticket_types %}
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" class="btn">Save changes</button>
+            <a href="{% url 'order_detail' order.pk %}" class="btn btn-outline">Cancel</a>
+        </div>
+        {% else %}
+        <a href="{% url 'order_detail' order.pk %}" class="btn btn-outline" style="margin-top: 1rem;">← Back to order</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

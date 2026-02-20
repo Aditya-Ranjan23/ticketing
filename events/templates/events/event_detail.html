@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.name }} – Ticketing{% endblock %}
+{% block content %}
+<div class="hero">
+    <p class="muted">{{ event.venue }} · {{ event.start_at|date:"d M Y" }} · {{ event.start_at|time:"H:i" }}</p>
+    <h1>{{ event.name }}</h1>
+</div>
+<div class="card" style="margin-bottom: 1.5rem;">
+    <p>{{ event.description }}</p>
+</div>
+<h2 style="margin-bottom: 1rem;">Tickets</h2>
+{% for tt in ticket_types %}
+<div class="card ticket-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <strong>{{ tt.name }}</strong>
+            <span class="muted"> — ${{ tt.price }} · {{ tt.quantity_available }} available</span>
+        </div>
+        <a href="{% url 'checkout_start' event.slug %}" class="btn">Reserve seat</a>
+    </div>
+</div>
+{% endfor %}
+<p style="margin-top: 1rem;"><a href="{% url 'event_list' %}" class="btn btn-outline">← All events</a></p>
+{% endblock %}
